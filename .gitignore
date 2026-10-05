@@ -14,3 +14,4 @@ coverage/
 *.log
 .expo/
 packages/*/fixtures/**/*.recorded.*
+.claude/worktrees/
