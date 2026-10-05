@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "codegen": { "cache": false, "outputs": ["src/**/*.gen.ts", "worker-configuration.d.ts"] },
+    "typecheck": { "dependsOn": ["^typecheck", "codegen"], "outputs": [] },
+    "lint": { "dependsOn": ["codegen"], "outputs": [] },
+    "test": { "dependsOn": ["codegen", "^typecheck"], "outputs": [] },
+    "build": { "dependsOn": ["^build", "codegen"], "outputs": ["dist/**"] },
+    "dry-run": { "dependsOn": ["codegen"], "cache": false }
+  }
+}

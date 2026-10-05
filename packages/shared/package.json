@@ -1,0 +1,28 @@
+{
+  "name": "@request.news/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./registry": "./src/registry/index.ts",
+    "./brand": "./src/brand.ts",
+    "./keys": "./src/keys.ts",
+    "./helpers": "./src/helpers.ts"
+  },
+  "scripts": {
+    "codegen": "echo 'shared: no codegen yet'",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "request-news-web",
+  "compatibility_date": "2026-10-05",
+  "workers_dev": true,
+  // "routes": [{ "pattern": "request.news", "custom_domain": true }],
+  // Assets-only Worker (no `main`); Workers Cache stays OFF so asset requests remain free.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "html_handling": "auto-trailing-slash"
+  }
+}

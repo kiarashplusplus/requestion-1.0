@@ -1,0 +1,17 @@
+# Macro (inflation) context (WS-C owns this file; research as of 2026-10-05)
+
+## Launch: BLS Public Data API v2 (US)
+- `POST https://api.bls.gov/publicAPI/v2/timeseries/data/` with JSON `{ seriesid: [...], startyear, endyear, registrationkey, calculations: true }`; or GET `/timeseries/data/{seriesId}?latest=true`. Key is free (https://data.bls.gov/registrationEngine/), renewed yearly. Limits: 500 queries/day, 50 series/query, 20 years/query, 50 requests per 10 s. v1 (no key) throttles by IP and failed from a shared egress IP in testing → **always use v2 with the key**.
+- Series (NSA `CUUR`, SA `CUSR` national only): `CUUR0000SA0` all items, `CUUR0000SA0E` energy, `CUUR0000SETB` motor fuel, `CUUR0000SETB01` gasoline (all types). Regions: `CUUR0100…/0200/0300/0400` (Northeast/Midwest/South/West). Metros (23): `CUURS12ASETB01` New York, `CUURS49ASETB01` Los Angeles, `CUURS37BSETB01` Houston, `CUURS23ASETB01` Chicago (UNVERIFIED code), others from https://download.bls.gov/pub/time.series/cu/cu.area (send a UA with contact email). NY/LA/Chicago monthly, other metros every two months (secondary source, UNVERIFIED).
+- Skip `M13` (annual average). **October 2025 CPI does not exist** (shutdown); values carried forward; render a gap, never interpolate.
+- Terms: cite the access date; include "BLS.gov cannot vouch for the data or analyses derived from these data after retrieval"; no BLS logo.
+- Release calendar: CPI for Sept 2026 publishes 2026-10-14.
+
+## Context sentence (contract)
+`buildMacroContext(country, regionCode?, asOf)` returns `{ cpiAllYoy, cpiGasolineYoy, cpiPeriod, sentence, sources }`, e.g. "Gasoline prices nationally are up 27.4% from a year ago (BLS CPI, August 2026), against 3.4% for all items." Prefer the metro series when the region maps to one of the 23 metros, else the region, else national; say which.
+
+## Real vs nominal (methodology page wording)
+Real price = nominal × CPI_base / CPI_t using the **all-items, not seasonally adjusted, same-geography** index (EIA/BLS method). Keep two separate statements: (1) gasoline CPI vs headline CPI is a *relative price* comparison; (2) the pump price deflated by CPI is a *real level*. Label the lag ("deflated with CPI through Aug 2026; pump price is the week of Sept 28"). Gasoline CPI covers all grades and is not the pump price. Never splice index series with different bases without saying so.
+
+## Phase 2 (international; not shipped)
+Eurostat `prc_hicp_minr` (JSON-stat; dimension `coicop18`: `TOTAL`, `NRG`, `CP0722`, `CP07221` diesel, `CP07222` petrol; units `RCH_A` annual %, `I25` index 2025=100; ECOICOP v2 from Jan 2026; old `prc_hicp_manr/midx` stop at 2025-12; ECB ICP flow retired 2026-02-04) · ONS `/economy/inflationandpriceindices/timeseries/{D7G7 all items, D7IO fuels & lubricants, L55O CPIH}/mm23/data` (identifying UA with contact, 120 req/10 s) · StatCan WDS vectors `v41690973` all-items, `v41691136` gasoline, `v41691239` energy (table 18-10-0004-01) · ABS `https://data.api.abs.gov.au/rest/data/ABS,CPI,2.0.0/1+3.10001+40081.10.50.M` with `Accept: application/vnd.sdmx.data+csv` (monthly CPI is headline since Nov 2025) · World Bank `FP.CPI.TOTL.ZG` annual fallback (CC BY 4.0) · IMF SDMX 3.0 `IMF.STA:CPI` monthly headline. **DBnomics is stale (BLS ends 2025-01); do not use as primary.** FRED only as a mirror (key; "This product uses the FRED® API but is not endorsed or certified by the Federal Reserve Bank of St. Louis").

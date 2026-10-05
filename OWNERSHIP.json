@@ -1,0 +1,37 @@
+{
+  "$comment": "Exclusive path ownership per swarm workstream. CI fails a PR whose diff touches paths outside its workstream (ADR files excepted). Orchestrator-only paths change via a contracts PR.",
+  "orchestrator": [
+    "OWNERSHIP.json",
+    "pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "package.json",
+    "turbo.json",
+    "tsconfig.base.json",
+    "apps/api/wrangler.jsonc",
+    "apps/api/src/index.ts",
+    "apps/api/src/env.ts",
+    "apps/api/src/middleware.ts",
+    "packages/db/migrations/**",
+    "docs/contracts.md"
+  ],
+  "shared-append-only": [
+    "packages/shared/src/registry/regions/*.ts",
+    "packages/shared/src/registry/feeds/*.ts",
+    "docs/decisions/ADR-*.md"
+  ],
+  "workstreams": {
+    "A": ["packages/shared/**", "packages/db/src/**", "apps/api/test/setup.ts", "apps/api/vitest.config.ts", "scripts/check-ownership.ts", "docs/contracts.md", "docs/REBUILD_BRIEF.md", "docs/SWARM_PLAN.md"],
+    "B": ["packages/feeds/**", "docs/feeds.md"],
+    "C": ["packages/macro/**", "apps/api/src/workflows/macro.ts", "apps/api/src/macro/**", "docs/macro.md"],
+    "D": ["apps/api/src/workflows/ingest.ts", "apps/api/src/ingest/**", "apps/api/src/routes/dev.ts", "packages/db/src/writers/**", "docs/runbook.md"],
+    "E": ["apps/api/src/routes/v1.ts", "apps/api/src/api/**", "packages/db/src/readers/**", "packages/shared/src/api-client.ts", "docs/api.md"],
+    "F": ["apps/api/src/routes/posts.ts", "apps/api/src/posts/**", "apps/api/src/workflows/posts.ts", "docs/distribution.md", "docs/editorial-policy.md", "docs/legal/**"],
+    "G": ["packages/news/**", "apps/api/src/workflows/news.ts", "apps/api/src/digest/**", "docs/news-digest.md"],
+    "H": ["packages/card/**", "apps/api/src/routes/cards.ts", "apps/api/src/social/**", "docs/cards.md", "docs/social.md"],
+    "I": ["apps/api/src/routes/agent.ts", "apps/api/src/mcp/**", "apps/api/src/agent/**", "mcp/**", "docs/agents.md"],
+    "J": ["apps/mobile/**", "apps/web/**", "docs/product.md"],
+    "K": [".github/**", "scripts/**", "docs/runbook.md", "docs/deploy.md", "README.md"],
+    "N": ["apps/api/src/notify/**", "docs/notifications.md"],
+    "P": ["apps/api/src/track/**", "ads/**", "docs/paid.md"]
+  }
+}

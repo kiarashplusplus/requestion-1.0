@@ -1,0 +1,69 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "request-news-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-05",
+  // Routes are enabled once request.news is registered and on Cloudflare. Until then workers.dev previews.
+  "workers_dev": true,
+  // "routes": [
+  //   { "pattern": "api.request.news", "custom_domain": true },
+  //   { "pattern": "request.news/p/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/us", "zone_name": "request.news" },
+  //   { "pattern": "request.news/us/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/sitemap*.xml", "zone_name": "request.news" },
+  //   { "pattern": "request.news/news-sitemap.xml", "zone_name": "request.news" },
+  //   { "pattern": "request.news/feed/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/card/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/data/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/embed/*", "zone_name": "request.news" },
+  //   { "pattern": "request.news/oembed", "zone_name": "request.news" },
+  //   { "pattern": "request.news/request", "zone_name": "request.news" },
+  //   { "pattern": "request.news/robots.txt", "zone_name": "request.news" },
+  //   { "pattern": "request.news/llms.txt", "zone_name": "request.news" },
+  //   { "pattern": "request.news/openapi.json", "zone_name": "request.news" },
+  //   { "pattern": "request.news/mcp", "zone_name": "request.news" },
+  //   { "pattern": "request.news/.well-known/*", "zone_name": "request.news" }
+  // ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": { "invocation_logs": true },
+    "traces": { "enabled": true, "head_sampling_rate": 0.1 }
+  },
+  "limits": { "cpu_ms": 30000 },
+  "rules": [{ "type": "Data", "globs": ["**/*.ttf", "**/*.wasm"], "fallthrough": true }],
+  "kv_namespaces": [{ "binding": "LATEST", "id": "TODO-provision" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "request-news-history",
+      "database_id": "TODO-provision",
+      "migrations_dir": "../../packages/db/migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "RAW", "bucket_name": "request-news-raw" }],
+  "workflows": [
+    { "binding": "INGEST", "name": "request-news-ingest", "class_name": "IngestWorkflow" },
+    { "binding": "MACRO", "name": "request-news-macro", "class_name": "MacroWorkflow" },
+    { "binding": "NEWS", "name": "request-news-news", "class_name": "NewsWorkflow" },
+    { "binding": "POSTS", "name": "request-news-posts", "class_name": "PostsWorkflow" }
+  ],
+  // Workflow cron schedules (Cloudflare, 2026-06-02). Enabled by WS-D once the dev trigger path is verified:
+  // INGEST: ["5 * * * *", "20 3 * * *"]  MACRO: ["40 6 * * *"]  NEWS: ["15 */6 * * *"]
+  "triggers": { "crons": ["5 * * * *", "20 3 * * *", "40 6 * * *", "15 */6 * * *"] },
+  "analytics_engine_datasets": [{ "binding": "METRICS", "dataset": "request_news_metrics" }],
+  "ratelimits": [
+    { "name": "API_RL", "namespace_id": "1001", "simple": { "limit": 120, "period": 60 } },
+    { "name": "REQUEST_RL", "namespace_id": "1002", "simple": { "limit": 5, "period": 60 } }
+  ],
+  "ai": { "binding": "AI" },
+  "vars": {
+    "API_VERSION": "v1",
+    "SITE_ORIGIN": "https://request.news",
+    "ENVIRONMENT": "development",
+    "DIGEST_DAILY_BUDGET": "300",
+    "FIXTURE_MODE": "0"
+  }
+  // Secrets (wrangler secret put): EIA_API_KEY, BLS_API_KEY, GNEWS_API_KEY, TURNSTILE_SECRET, INDEXNOW_KEY,
+  // DEV_TRIGGER_TOKEN, EMAIL_PROVIDER_KEY, IG_ACCESS_TOKEN. See .dev.vars.example.
+}

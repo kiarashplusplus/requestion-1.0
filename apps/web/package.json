@@ -1,0 +1,18 @@
+{
+  "name": "@request.news/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "echo 'web: no codegen'",
+    "typecheck": "echo 'web: static assets only'",
+    "lint": "echo 'web: static assets only'",
+    "test": "echo 'web: no tests'",
+    "dev": "wrangler dev --port 8788",
+    "dry-run": "wrangler deploy --dry-run --outdir out",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "catalog:"
+  }
+}

@@ -1,0 +1,18 @@
+# Notifications (WS-N owns this file). US-only envelope; the dedicated researcher was stopped, so WS-N verifies provider facts against primary sources before shipping.
+
+## Law (US)
+- **CAN-SPAM** (15 U.S.C. §7701; FTC guide): applies to commercial email incl. newsletters. Required: truthful headers/subject, identification as an ad where applicable, **valid physical postal address** (PO Box or CMRA is fine), a clear opt-out honored within 10 business days, no harvested/dictionary addresses (aggravated violations). Penalty up to $53,088 per email. Email to addresses users typed into our request form, with a clear purpose line, is lawful without a separate checkbox; we still log consent.
+- **TCPA** for SMS/WhatsApp to US numbers: prior express consent for automated messages (the FCC one-to-one consent rule was vacated Jan 2025; the baseline consent requirement stands). Not used at launch.
+- **State privacy laws:** Notice at Collection beside the email form (CCPA/CPRA if thresholds are met; cheap to do regardless); email is personal data → deletion requests honored via `hello@request.news`.
+- Not applicable while US-only (revisit if expanding): GDPR/ePrivacy, UK PECR, Canada CASL, Australia Spam Act.
+
+## Meta WhatsApp Business policy (independent of law)
+Business-initiated messages require **documented opt-in** that states the message type; without it, quality rating drops and templates pause. US marketing-template messages have been paused by Meta since April 2025 (status in Oct 2026 UNVERIFIED). Utility templates (e.g. "your requested page is live") are allowed after opt-in. Pricing is per message by category and country (US utility/marketing rates UNVERIFIED). **At launch:** a public WhatsApp Channel (follower-based, no per-message cost) + `wa.me` click-to-chat links to collect opt-ins; Cloud API utility templates only for opted-in users; messaging tiers scale 250 → 1k → 10k → 100k unique users/24 h.
+
+## Design
+- **Capture:** `/request` form field "Email (we'll tell you when your page is live and send weekly price updates for this place; unsubscribe anytime)". Store `Subscriber` with consent log `{ noticeVersion, at, ipHash, userAgent, gpc }`. Double opt-in is not legally required in the US; use single opt-in with an immediate transactional confirmation that doubles as the "page is live" notice.
+- **Messages:** transactional (`request received`, `page is live`) → immediate; `weekly_digest` (Monday after EIA publishes) and `price_alert` (≥ 10¢ week-over-week move in the subscribed place) → batched jobs from a Workflow step.
+- **Compliance mechanics:** footer with operator name + postal address (`BRAND.operatorPostalAddress`) + "why you got this"; `List-Unsubscribe: <https://request.news/u/{token}>, <mailto:…>` and `List-Unsubscribe-Post: List-Unsubscribe=One-Click` (RFC 8058); one-click page also at `/u/{token}`; suppression table checked before every send; bounces/complaints → suppression; SPF, DKIM, DMARC (`p=quarantine` → `reject`); Gmail/Yahoo bulk-sender rules (< 0.3 % spam rate; one-click unsubscribe; aligned domains).
+- **Provider:** Cloudflare Email Sending if GA with adequate volume (verify binding name, limits, pricing), else Resend or SES via `aws4fetch` from Workers. Adapter interface `sendEmail({ to, subject, html, text, headers })`; provider chosen by `EMAIL_PROVIDER` var; key in `EMAIL_PROVIDER_KEY`.
+- **Cost model to verify:** at 10k / 100k / 1M emails per month for Cloudflare vs Resend vs SES; WhatsApp utility messages per 1k.
+- **Metrics:** Analytics Engine events `email_sent`, `email_bounced`, `email_complaint`, `email_unsub`, `alert_fired` (by place; no addresses).

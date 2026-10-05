@@ -1,0 +1,30 @@
+{
+  "name": "request.news",
+  "private": true,
+  "description": "request.news: US gas prices as the local news. Request a place, get a verified, auto-refreshing post.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "codegen": "turbo run codegen",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "check": "turbo run codegen typecheck lint test",
+    "ownership": "tsx scripts/check-ownership.ts",
+    "dev": "pnpm --filter @request.news/api dev"
+  },
+  "devDependencies": {
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "tsx": "catalog:"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "@cloudflare/workerd-linux-64"
+    ]
+  }
+}

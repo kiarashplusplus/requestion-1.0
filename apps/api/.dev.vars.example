@@ -1,0 +1,17 @@
+# Copy to .dev.vars (gitignored). Every key documented; code fails fast when a required one is missing.
+# EIA Open Data API v2 key (free): https://www.eia.gov/opendata/   -> powers us-eia-weekly ingest
+EIA_API_KEY=
+# BLS Public Data API v2 key (free, renew yearly): https://data.bls.gov/registrationEngine/  -> CPI context
+BLS_API_KEY=
+# GNews Essential (paid, commercial): https://gnews.io/  -> news discovery for the re-digest (optional in dev)
+GNEWS_API_KEY=
+# Cloudflare Turnstile secret for the web /request form
+TURNSTILE_SECRET=
+# IndexNow key (8-128 chars [a-zA-Z0-9-]); also served at /.well-known/indexnow/<key>.txt
+INDEXNOW_KEY=
+# Bearer token guarding POST /__dev/workflow/:name (dev/staging only; absent in production)
+DEV_TRIGGER_TOKEN=dev
+# Email provider key (Cloudflare Email Sending / Resend / SES) -> WS-N
+EMAIL_PROVIDER_KEY=
+# Instagram Graph API long-lived token for the brand account -> WS-H publisher job
+IG_ACCESS_TOKEN=
